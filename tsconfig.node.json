@@ -1,0 +1,10 @@
+{
+    // TS compilation settings for Node.js code (e.g., Vite config, ESLint config)
+    "include": ["eslint.config.js", "vite.config.ts"],
+    "extends": "./tsconfig.base.json",
+    "compilerOptions": {
+        "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+        "lib": ["ES2023"],
+        "types": ["node"]
+    }
+}

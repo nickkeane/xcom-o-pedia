@@ -1,0 +1,10 @@
+{
+    // This is a project reference configuration file only.
+    // Actual compilation is handled by tsconfig.app.json and tsconfig.node.json.
+    // The empty 'files' array and 'references' field prevent this config from compiling anything.
+    "files": [],
+    "references": [
+        { "path": "./tsconfig.app.json" },
+        { "path": "./tsconfig.node.json" }
+    ]
+}
