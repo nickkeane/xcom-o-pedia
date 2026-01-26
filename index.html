@@ -1,6 +1,23 @@
-<!-- <head>
-  <script id="xpedia-js" src="xpedia.js"></script>
-  <link id="main-css" href="main.css"/ rel="stylesheet">
-  <link id="light-css" media="none" href="light.css"/ rel="stylesheet">
-  <script>clog = (...args)=>console.trace(args)</script>
-</head> -->
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>XCOM-O-Pedia</title>
+        <link rel="icon" type="image/svg+xml" href="./public/vite.svg" />
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <script id="xpedia-js" src="./lib/xpedia.js"></script>
+        <link id="main-css" href="./public/assets/main.css" rel="stylesheet" />
+        <link
+            id="light-css"
+            href="./public/assets/light.css"
+            rel="stylesheet"
+        />
+        <script>
+            clog = (...args) => console.trace(args);
+        </script>
+        <script type="module" src="/src/main.tsx"></script>
+    </head>
+    <body>
+        <div id="root"></div>
+    </body>
+</html>

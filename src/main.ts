@@ -1,1 +1,0 @@
-import Ruleset, { rul } from "./Ruleset";
