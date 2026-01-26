@@ -5,8 +5,8 @@ import { inform, loadingFile, warn } from "./store";
 import { fetchText } from "./util";
 
 declare const
-  fsData: (path:string)=>string
-;
+  fsData: (path: string) => string
+  ;
 
 export async function unpackZip(text) {
   let jszip = new JSZip();
@@ -20,7 +20,7 @@ export async function packZip(text) {
   let jszip = new JSZip();
   jszip.file("main", text)
   let file = jszip.generateAsync({
-    type: "base64", 
+    type: "base64",
     compression: "DEFLATE",
     compressionOptions: {
       level: 6
@@ -101,12 +101,12 @@ export async function loadPacked() {
   }
 }
 
-function onlyDirs(files:string[]){
-  return files.filter(dir=>dir[dir.length-1] == "/")
+function onlyDirs(files: string[]) {
+  return files.filter(dir => dir[dir.length - 1] == "/")
 }
 
 export async function loadFromFiles() {
-  
+
   let [options, modDirs, rootDirs, xpediaDirs]: [OXCOptions, string[], string[], string[]] =
     await Promise.all([
       readYaml(`${OXCPath}user/options.cfg`),
@@ -119,12 +119,12 @@ export async function loadFromFiles() {
   rootDirs = onlyDirs(rootDirs);
   xpediaDirs = onlyDirs(xpediaDirs);
 
-  if(modDirs.length == 0){
+  if (modDirs.length == 0) {
     warn("can't find user/mods dir. Assuming we are in mod dir")
     modDirs = rootDirs;
   }
-  
-  if(options == null){
+
+  if (options == null) {
     warn("can't find user/options.cfg file. Loading all mods")
   }
 
@@ -133,25 +133,25 @@ export async function loadFromFiles() {
   let allModDirs = [...modDirs, ...xpediaDirs]
   let modMetadataById = {};
   let modMetadata = await Promise.all(allModDirs.map(dir => readYaml(`${dir}metadata.yml`)))
-  modMetadata = modMetadata.filter(m=>m);
+  modMetadata = modMetadata.filter(m => m);
 
   for (let i in modMetadata) {
     let data = modMetadata[i];
-    if(data==null)
+    if (data == null)
       continue;
     let dir = allModDirs[i];
     modMetadataById[data.id] = { ...data, dir };
   }
 
   let activeMods: string[];
-    
-  let masterModIds = modMetadata.filter(m=>m.isMaster).map(m=>m.id);
+
+  let masterModIds = modMetadata.filter(m => m.isMaster).map(m => m.id);
   masterModIds.push("xpedia");
 
-  if(options){
-    activeMods = ["xcom1", ...[...options.mods.filter(m => m.active), ...modMetadata.filter(m=>m.active)].map(m => m.id)];
+  if (options) {
+    activeMods = ["xcom1", ...[...options.mods.filter(m => m.active), ...modMetadata.filter(m => m.active)].map(m => m.id)];
   } else {
-    activeMods = ["xcom1", ...modMetadata.map(m=>m.id)];
+    activeMods = ["xcom1", ...modMetadata.map(m => m.id)];
   }
 
   activeMods = activeMods.filter(id => {
@@ -159,18 +159,18 @@ export async function loadFromFiles() {
     return mod && (mod.isMaster || masterModIds.includes(mod.master));
   });
 
-  const priority = (id:string)=>{
+  const priority = (id: string) => {
     let mod = modMetadataById[id];
-    if(mod.master == "xpedia")
+    if (mod.master == "xpedia")
       return 0;
-    if(mod.master == null)
+    if (mod.master == null)
       return 1;
-    if(mod.master == "xcom1")
+    if (mod.master == "xcom1")
       return 2;
     return 3;
   }
 
-  activeMods = activeMods.sort((a,b)=>priority(a) - priority(b))
+  activeMods = activeMods.sort((a, b) => priority(a) - priority(b))
 
   let activeModsMetadata = activeMods.map(id => modMetadataById[id])
   for (let mod of activeModsMetadata)
@@ -179,20 +179,20 @@ export async function loadFromFiles() {
   let langDirs = activeModsMetadata.map(m => `${m.dir}Language/`);
 
   langDirs.splice(1, 0, "/standard/xcom1/Language/OXCE/");
-  
+
   let [ruls, langs] = await Promise.all(
     [loadRulsFromMods(activeModsMetadata),
     loadLanguagesFromDirs(langDirs)]
   );
-  
+
   return { ruls, langs, mods: activeModsMetadata }
 }
 
 const extRegexp = /^(.+)\.([0-9a-z\-]+)?$/i;
 
-function splitName(name){
+function splitName(name) {
   let m = name.match(extRegexp);
-  return m?{body:m[1],ext:m[2]}:{body:name,ext:""};
+  return m ? { body: m[1], ext: m[2] } : { body: name, ext: "" };
 }
 
 
@@ -210,18 +210,18 @@ async function loadLanguagesFromDirs(dirs: string[]) {
 
   let data = await Promise.all(files.map(f => {
     let path = `${f.dir}${f.lname}`;
-    return splitName(f.lname).ext == "yml"?readYaml(path):readTextFile(path);
+    return splitName(f.lname).ext == "yml" ? readYaml(path) : readTextFile(path);
   }))
 
   for (let i in data) {
     let text = data[i];
     let fname = files[i].lname;
     if (typeof text == "object") {
-      let lname =  Object.keys(text)[0]
+      let lname = Object.keys(text)[0]
       lng[lname] = { ...(lng[lname] || {}), ...text[lname] }
     } else {
       let split = splitName(fname);
-      if(split.ext != "yml"){
+      if (split.ext != "yml") {
         let split2 = splitName(split.body);
         lng[split2.ext] = lng[split2.ext] || {};
         lng[split2.ext][split2.body] = text;
@@ -260,14 +260,14 @@ export function useCache(data) {
       const transaction = db.transaction("cache", "readwrite");
       const store = transaction.objectStore("cache");
 
-      if (data == "load"){
+      if (data == "load") {
         const query = store.get(1);
         query.onsuccess = () => {
-          let data = query.result?.data;          
-          done(data?JSON.parse(data):null);
-        };        
+          let data = query.result?.data;
+          done(data ? JSON.parse(data) : null);
+        };
       } else {
-        if(data == "wipe")
+        if (data == "wipe")
           store.delete(1);
         else
           store.put({ id: 1, data: JSON.stringify(data) });
@@ -275,7 +275,7 @@ export function useCache(data) {
       }
 
       transaction.oncomplete = () => {
-        db.close();        
+        db.close();
       }
     }
   })
@@ -294,14 +294,14 @@ export async function loadRules(rul) {
   } else {
     loadingFile.set("loading from cache")
     data = await useCache("load");
-    if(!data){
+    if (!data) {
       loadingFile.set("loading from local files")
       data = await loadFromFiles();
       useCache(data);
     }
   }
 
-  if(data == null){
+  if (data == null) {
     warn("Failed to load rules")
     return;
   }
@@ -311,16 +311,16 @@ export async function loadRules(rul) {
   await delay(10);
 }
 
-export async function loadData(path:string){
-  if(typeof fsData != "undefined"){
+export async function loadData(path: string) {
+  if (typeof fsData != "undefined") {
     return fsData(path);
   } else {
     return path;
   }
 }
 
-export async function readStyle(id:string){
+export async function readStyle(id: string) {
   let css = document.getElementById(id) as HTMLLinkElement;
-  return css.href?(await (await fetch(css.href)).text()):css.innerHTML;    
+  return css.href ? (await (await fetch(css.href)).text()) : css.innerHTML;
 }
 
